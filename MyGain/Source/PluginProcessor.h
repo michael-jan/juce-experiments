@@ -53,7 +53,14 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    /* stores our plugin's entire state (all parameter values) */
+    juce::AudioProcessorValueTreeState vts;
+    
 private:
+    
+    // used to smoothen out gain changes
+    float prevGain;
+        
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MyGainAudioProcessor)
 };
