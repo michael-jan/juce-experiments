@@ -54,7 +54,7 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     /* stores our plugin's entire state (all parameter values) */
-    juce::AudioProcessorValueTreeState vts;
+    juce::AudioProcessorValueTreeState params;
     
 private:
     

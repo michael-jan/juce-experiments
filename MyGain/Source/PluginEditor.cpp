@@ -18,7 +18,7 @@ MyGainAudioProcessorEditor::MyGainAudioProcessorEditor (MyGainAudioProcessor& p)
     addAndMakeVisible(gainSlider);
     
     gainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-                                audioProcessor.vts, "GAIN", gainSlider
+                                audioProcessor.params, "GAIN", gainSlider
                            );
     
     // Make sure that before the constructor has finished, you've set the

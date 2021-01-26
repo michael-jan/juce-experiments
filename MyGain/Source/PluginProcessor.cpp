@@ -20,9 +20,8 @@ MyGainAudioProcessor::MyGainAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ),
-        // initialize the value state tree with list of parameters
-        vts(*this, nullptr, "PARAMETERS",
-            { std::make_unique<juce::AudioParameterFloat>("GAIN", "Gain", 0.0f, 1.0f, 0.5f) })
+        params(*this, nullptr, "PARAMETERS",
+              { std::make_unique<juce::AudioParameterFloat>("GAIN", "Gain", 0.0f, 1.0f, 0.5f) })
 
 #endif
 {
@@ -99,7 +98,7 @@ void MyGainAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    prevGain = *vts.getRawParameterValue("GAIN");
+    prevGain = *params.getRawParameterValue("GAIN");
 }
 
 void MyGainAudioProcessor::releaseResources()
@@ -150,7 +149,7 @@ void MyGainAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         buffer.clear (i, 0, buffer.getNumSamples());
     
     // Apply gain ramp
-    float currGain = *vts.getRawParameterValue("GAIN");
+    float currGain = *params.getRawParameterValue("GAIN");
     buffer.applyGainRamp(0, buffer.getNumSamples(), prevGain, currGain);
     prevGain = currGain;
 }
@@ -174,7 +173,7 @@ void MyGainAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
     // as intermediaries to make it easy to save and load complex data.
     
     // Make a copy of our state (required for thread-safety)
-    juce::ValueTree state = vts.copyState();
+    juce::ValueTree state = params.copyState();
     
     // Serialize parameters into XML format
     std::unique_ptr<juce::XmlElement> xml = state.createXml();
@@ -191,11 +190,11 @@ void MyGainAudioProcessor::setStateInformation (const void* data, int sizeInByte
     // Read XML from buffer
     std::unique_ptr<juce::XmlElement> xml = getXmlFromBinary(data, sizeInBytes);
 
-    if (xml.get() != nullptr && xml->hasTagName(vts.state.getType())) {
+    if (xml.get() != nullptr && xml->hasTagName(params.state.getType())) {
         // Deserialize XML
         juce::ValueTree state = juce::ValueTree::fromXml(*xml);
         // Replace our actual state
-        vts.replaceState(state);
+        params.replaceState(state);
     }
 }
 
