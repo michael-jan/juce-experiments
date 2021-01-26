@@ -20,6 +20,7 @@ MyGainAudioProcessor::MyGainAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ),
+        // initialize the value state tree with list of parameters
         vts(*this, nullptr, "PARAMETERS",
             { std::make_unique<juce::AudioParameterFloat>("GAIN", "Gain", 0.0f, 1.0f, 0.5f) })
 
@@ -98,6 +99,7 @@ void MyGainAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    prevGain = *vts.getRawParameterValue("GAIN");
 }
 
 void MyGainAudioProcessor::releaseResources()
@@ -170,12 +172,31 @@ void MyGainAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+    
+    // Make a copy of our state (required for thread-safety)
+    juce::ValueTree state = vts.copyState();
+    
+    // Serialize parameters into XML format
+    std::unique_ptr<juce::XmlElement> xml = state.createXml();
+    
+    // Write XML to buffer
+    copyXmlToBinary(*xml, destData);
 }
 
 void MyGainAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+    
+    // Read XML from buffer
+    std::unique_ptr<juce::XmlElement> xml = getXmlFromBinary(data, sizeInBytes);
+
+    if (xml.get() != nullptr && xml->hasTagName(vts.state.getType())) {
+        // Deserialize XML
+        juce::ValueTree state = juce::ValueTree::fromXml(*xml);
+        // Replace our actual state
+        vts.replaceState(state);
+    }
 }
 
 //==============================================================================
