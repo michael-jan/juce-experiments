@@ -17,9 +17,7 @@ MyGainAudioProcessorEditor::MyGainAudioProcessorEditor (MyGainAudioProcessor& p)
     gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 50);
     addAndMakeVisible(gainSlider);
     
-    gainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-                                audioProcessor.params, "GAIN", gainSlider
-                           );
+    gainSliderAttachment.reset(new SliderAttachment(audioProcessor.params, "GAIN", gainSlider));
     
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.

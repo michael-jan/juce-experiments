@@ -14,6 +14,9 @@
 //==============================================================================
 /**
 */
+
+using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
+
 class MyGainAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
@@ -26,7 +29,7 @@ public:
 
 private:
     juce::Slider gainSlider;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainSliderAttachment;
+    std::unique_ptr<SliderAttachment> gainSliderAttachment;
     
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
